@@ -55,6 +55,11 @@ internal class WorkspaceCheck : EditorForm
             editor.DrawToBitmap(screenshot, new Rectangle(Point.Empty, editor.Size));
             screenshot.Save(args[0], System.Drawing.Imaging.ImageFormat.Png);
         }
+        var language = (ComboBox)editor.Controls.Find("languageChoice", true).Single();
+        language.SelectedIndex = 1;
+        Require(editor.Text == "Photo Editor" && compare.Text == "Compare with original", "English captions missing");
+        language.SelectedIndex = 0;
+        Require(editor.Text == "Обробник фотографій", "Ukrainian captions missing");
         var before = preview.Size;
         Message message = default;
         editor.ProcessCmdKey(ref message, Keys.F11);

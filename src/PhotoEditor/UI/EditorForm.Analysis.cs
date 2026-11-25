@@ -103,8 +103,8 @@ public partial class EditorForm
 
         // Створення буфера для текстового представлення матриці
         System.Text.StringBuilder sb = new System.Text.StringBuilder();
-        sb.AppendLine($"Розмір джерела: {source.Width} × {source.Height}. Матриця preview: {rows} × {cols}.");
-        sb.AppendLine("Яскравість = 0.299R + 0.587G + 0.114B; значення 0..255.");
+        sb.AppendLine((UiLanguage.English ? $"Source size: {source.Width} × {source.Height}. Matrix preview: {rows} × {cols}." : $"Розмір джерела: {source.Width} × {source.Height}. Матриця preview: {rows} × {cols}."));
+        sb.AppendLine((UiLanguage.English ? "Brightness = 0.299R + 0.587G + 0.114B; values 0..255." : "Яскравість = 0.299R + 0.587G + 0.114B; значення 0..255."));
 
         // Ітерація по зображенню з заданим кроком
         for (int y = 0; y < source.Height; y += stepY)
@@ -201,7 +201,7 @@ public partial class EditorForm
             : 0;
 
         // Форматування та виведення статистичних даних у Label
-        stats.Text = $"Мінімум: {min}   Максимум: {max}   Середнє: {average:F1}   Пікселів: {source.Width * source.Height:N0}";
+        stats.Text = (UiLanguage.English ? $"Minimum: {min}   Maximum: {max}   Mean: {average:F1}   Pixels: {source.Width * source.Height:N0}" : $"Мінімум: {min}   Максимум: {max}   Середнє: {average:F1}   Пікселів: {source.Width * source.Height:N0}");
 
         // Збереження масиву частот у властивість Tag панелі для наступного малювання
         panel.Tag = values;
@@ -322,12 +322,12 @@ public partial class EditorForm
 
             // Фіксація поточного стану як базового та логування
             CaptureCurrentPreviewAsBase();
-            Log($"Збережено результат для поточного зображення: {Path.GetFileName(savePath)}");
+            Log((UiLanguage.English ? $"Current result saved: {Path.GetFileName(savePath)}" : $"Збережено результат для поточного зображення: {Path.GetFileName(savePath)}"));
         }
         catch (Exception ex)
         {
             // Логування помилки у разі збою запису
-            Log($"Помилка збереження результату: {ex.Message}");
+            Log((UiLanguage.English ? $"Could not save result: {ex.Message}" : $"Помилка збереження результату: {ex.Message}"));
         }
     }
 
@@ -352,12 +352,12 @@ public partial class EditorForm
 
                 SetPreviewImage(result);
 
-                Log($"Сигма-фільтр: Sigma = {sigma:0.0}");
+                Log((UiLanguage.English ? $"Sigma filter: Sigma = {sigma:0.0}" : $"Сигма-фільтр: Sigma = {sigma:0.0}"));
             }
         }
         catch (Exception ex)
         {
-            Log($"Помилка сигма-фільтра: {ex.Message}");
+            Log((UiLanguage.English ? $"Sigma filter error: {ex.Message}" : $"Помилка сигма-фільтра: {ex.Message}"));
         }
     }
 
@@ -399,11 +399,11 @@ public partial class EditorForm
             }
 
             CaptureCurrentPreviewAsBase();
-            Log($"Збережено результат сигма-фільтра: {Path.GetFileName(savePath)}");
+            Log((UiLanguage.English ? $"Sigma filter result saved: {Path.GetFileName(savePath)}" : $"Збережено результат сигма-фільтра: {Path.GetFileName(savePath)}"));
         }
         catch (Exception ex)
         {
-            Log($"Помилка збереження сигма-фільтра: {ex.Message}");
+            Log((UiLanguage.English ? $"Could not save sigma filter result: {ex.Message}" : $"Помилка збереження сигма-фільтра: {ex.Message}"));
         }
     }
 
@@ -426,7 +426,7 @@ public partial class EditorForm
         SetPreviewImage(result);
 
         Log(
-            $"Фільтр шуму: {comboNoiseFilter.SelectedItem}");
+            (UiLanguage.English ? $"Noise filter: {comboNoiseFilter.SelectedItem}" : $"Фільтр шуму: {comboNoiseFilter.SelectedItem}"));
     }
 
     private void comboNoiseFilter_SelectedIndexChanged(object sender, EventArgs e)
@@ -440,19 +440,19 @@ public partial class EditorForm
         if (originalBitmapForPreview == null)
         {
             MessageBox.Show(
-                "Спочатку виберіть зображення.");
+                (UiLanguage.English ? "First select an image." : "Спочатку виберіть зображення."));
             return;
         }
 
         UpdateNoiseFilterPreview();
 
         Log(
-            $"Застосовано: {comboNoiseFilter.SelectedItem}");
+            (UiLanguage.English ? $"Applied: {comboNoiseFilter.SelectedItem}" : $"Застосовано: {comboNoiseFilter.SelectedItem}"));
     }
 
     private string GetNoiseFilterType(int index)
     {
-        return index <= 2 ? "Лінійний" : "Нелінійний";
+        return index <= 2 ? (UiLanguage.English ? "Linear" : "Лінійний") : (UiLanguage.English ? "Nonlinear" : "Нелінійний");
     }
 
     private string SafeFilePart(string value)
@@ -464,7 +464,7 @@ public partial class EditorForm
 
     private void AddNoiseResultRow(string imageName, int filterIndex, double mse, string savedFile = "")
     {
-        string filterName = comboNoiseFilter.Items[filterIndex]?.ToString() ?? $"Фільтр {filterIndex + 1}";
+        string filterName = comboNoiseFilter.Items[filterIndex]?.ToString() ?? (UiLanguage.English ? $"Filter {filterIndex + 1}" : $"Фільтр {filterIndex + 1}");
         dgvNoiseResults.Rows.Add(imageName, filterName, GetNoiseFilterType(filterIndex), mse.ToString("F4"), savedFile);
     }
 
@@ -472,12 +472,12 @@ public partial class EditorForm
     {
         if (originalBitmapForPreview == null)
         {
-            MessageBox.Show("Спочатку виберіть зображення.");
+            MessageBox.Show((UiLanguage.English ? "First select an image." : "Спочатку виберіть зображення."));
             return;
         }
 
         dgvNoiseResults.Rows.Clear();
-        string imageName = listSelectFile.SelectedItem?.ToString() ?? "поточне зображення";
+        string imageName = listSelectFile.SelectedItem?.ToString() ?? (UiLanguage.English ? "current image" : "поточне зображення");
 
         using Bitmap source = new Bitmap(originalBitmapForPreview);
         for (int i = 0; i < comboNoiseFilter.Items.Count; i++)
@@ -487,14 +487,14 @@ public partial class EditorForm
             AddNoiseResultRow(imageName, i, mse);
         }
 
-        Log($"Перевірено 10 фільтрів для {imageName}. Результати виведено в таблицю.");
+        Log((UiLanguage.English ? $"Checked 10 filters for {imageName}. Results are shown in the table." : $"Перевірено 10 фільтрів для {imageName}. Результати виведено в таблицю."));
     }
 
     private void buttonSaveNoiseResult_Click(object? sender, EventArgs e)
     {
         if (picturePreview.Image == null || listSelectFile.SelectedIndex < 0)
         {
-            MessageBox.Show("Спочатку виберіть зображення та фільтр.");
+            MessageBox.Show((UiLanguage.English ? "Select an image and a filter." : "Спочатку виберіть зображення та фільтр."));
             return;
         }
 
@@ -509,14 +509,14 @@ public partial class EditorForm
 
         using Bitmap result = BitmapOperations.Ensure32bpp(picturePreview.Image);
         result.Save(dialog.FileName, ImageFormat.Bmp);
-        Log($"Збережено: {Path.GetFileName(dialog.FileName)}");
+        Log((UiLanguage.English ? $"Saved: {Path.GetFileName(dialog.FileName)}" : $"Збережено: {Path.GetFileName(dialog.FileName)}"));
     }
 
     private void buttonProcessAllNoiseImages_Click(object? sender, EventArgs e)
     {
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку відкрийте фотографії.");
+            MessageBox.Show((UiLanguage.English ? "Open photos first." : "Спочатку відкрийте фотографії."));
             return;
         }
 
@@ -547,21 +547,21 @@ public partial class EditorForm
             }
             catch (Exception ex)
             {
-                Log($"Помилка для {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Error for {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка для {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
         string csvPath = Path.Combine(outputDir, "noise_filter_results.csv");
         SaveNoiseTableToCsv(csvPath);
-        Log($"Готово: збережено {savedCount} BMP-файлів і таблицю {Path.GetFileName(csvPath)}.");
-        MessageBox.Show($"Обробку завершено.\nЗбережено BMP: {savedCount}\nТаблиця: {csvPath}");
+        Log((UiLanguage.English ? $"Done: saved {savedCount} BMP-files and the table {Path.GetFileName(csvPath)}." : $"Готово: збережено {savedCount} BMP-файлів і таблицю {Path.GetFileName(csvPath)}."));
+        MessageBox.Show((UiLanguage.English ? $"Processing complete.\nSaved BMP: {savedCount}\nTable: {csvPath}" : $"Обробку завершено.\nЗбережено BMP: {savedCount}\nТаблиця: {csvPath}"));
     }
 
     private void buttonSaveNoiseCsv_Click(object? sender, EventArgs e)
     {
         if (dgvNoiseResults.Rows.Count == 0)
         {
-            MessageBox.Show("Таблиця порожня. Спочатку виконайте перевірку фільтрів.");
+            MessageBox.Show((UiLanguage.English ? "The table is empty. Run the filter comparison first." : "Таблиця порожня. Спочатку виконайте перевірку фільтрів."));
             return;
         }
 
@@ -573,13 +573,13 @@ public partial class EditorForm
         if (dialog.ShowDialog() != DialogResult.OK) return;
 
         SaveNoiseTableToCsv(dialog.FileName);
-        Log($"Таблицю збережено: {Path.GetFileName(dialog.FileName)}");
+        Log((UiLanguage.English ? $"Table saved: {Path.GetFileName(dialog.FileName)}" : $"Таблицю збережено: {Path.GetFileName(dialog.FileName)}"));
     }
 
     private void SaveNoiseTableToCsv(string path)
     {
         using StreamWriter writer = new StreamWriter(path, false, new UTF8Encoding(true));
-        writer.WriteLine("Зображення;Фільтр;Тип фільтра;ε²;Збережений файл");
+        writer.WriteLine((UiLanguage.English ? "Image;Filter;Filter type;ε²;Saved file" : "Зображення;Фільтр;Тип фільтра;ε²;Збережений файл"));
 
         foreach (DataGridViewRow row in dgvNoiseResults.Rows)
         {

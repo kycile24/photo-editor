@@ -49,6 +49,7 @@ public partial class EditorForm : Form
         InitializeNoiseResultsUi();
         AttachLivePreviewEvents();
         ConfigureWorkspace();
+        ApplyLanguage(this);
 
         slideshowTimer = new Timer();
         slideshowTimer.Tick += slideshowTimer_Tick;
@@ -108,7 +109,7 @@ public partial class EditorForm : Form
             return;
         }
 
-        Log($"Обрано дію: {activeActionGroup.Text}");
+        Log((UiLanguage.English ? $"Selected tool: {activeActionGroup.Text}" : $"Обрано дію: {activeActionGroup.Text}"));
 
         if (originalBitmapForPreview == null) return;
 
@@ -161,8 +162,8 @@ public partial class EditorForm : Form
         if (activeActionGroup == group) return true;
 
         MessageBox.Show(
-            $"Спочатку виберіть дію «{group.Text}» у випадаючому списку.",
-            "Дію не вибрано",
+            (UiLanguage.English ? $"First select the tool «{group.Text}» in the dropdown." : $"Спочатку виберіть дію «{group.Text}» у випадаючому списку."),
+            (UiLanguage.English ? "No tool selected" : "Дію не вибрано"),
             MessageBoxButtons.OK,
             MessageBoxIcon.Information);
         return false;
@@ -174,7 +175,7 @@ public partial class EditorForm : Form
         if (comboFormat.Items.Count > 0)
             comboFormat.SelectedIndex = 0;
 
-        Log("Програму запущено. Оберіть зображення для початку.");
+        Log((UiLanguage.English ? "Editor ready. Choose an image to begin." : "Програму запущено. Оберіть зображення для початку."));
     }
 
     private System.Windows.Forms.Timer livePreviewTimer = null!;
@@ -205,7 +206,7 @@ public partial class EditorForm : Form
         using (OpenFileDialog ofd = new OpenFileDialog())
         {
             ofd.Multiselect = true;
-            ofd.Filter = "Зображення|*.jpg;*.jpeg;*.png;*.bmp;*.gif|Всі файли|*.*";
+            ofd.Filter = (UiLanguage.English ? "Image|*.jpg;*.jpeg;*.png;*.bmp;*.gif|All files|*.*" : "Зображення|*.jpg;*.jpeg;*.png;*.bmp;*.gif|Всі файли|*.*");
             if (ofd.ShowDialog() == DialogResult.OK)
             {
                 LoadFiles(ofd.FileNames);
@@ -243,7 +244,7 @@ public partial class EditorForm : Form
         }
 
         UpdateMergeImageSelectors();
-        Log($"Обрано файлів: {selectedFiles.Count}");
+        Log((UiLanguage.English ? $"Files selected: {selectedFiles.Count}" : $"Обрано файлів: {selectedFiles.Count}"));
     }
 
     private void buttonResetOriginal_Click(object sender, EventArgs e)
@@ -256,7 +257,7 @@ public partial class EditorForm : Form
     {
         if (originalBitmapForPreview == null)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 

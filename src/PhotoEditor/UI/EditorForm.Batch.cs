@@ -10,7 +10,7 @@ public partial class EditorForm
     {
         using (FolderBrowserDialog fbd = new FolderBrowserDialog())
         {
-            fbd.Description = "Оберіть папку для збереження оброблених зображень";
+            fbd.Description = (UiLanguage.English ? "Choose an output folder" : "Оберіть папку для збереження оброблених зображень");
             if (fbd.ShowDialog() == DialogResult.OK)
             {
                 return fbd.SelectedPath;
@@ -25,7 +25,7 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -43,7 +43,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log($"--- Початок конвертації у {targetFormatStr} ---");
+        Log((UiLanguage.English ? $"--- Converting to {targetFormatStr} ---" : $"--- Початок конвертації у {targetFormatStr} ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -66,15 +66,15 @@ public partial class EditorForm
                 long newSize = newInfo.Length;
                 double diff = originalSize > 0 ? ((double)(newSize - originalSize) / originalSize) * 100 : 0;
 
-                Log($"{Path.GetFileName(filePath)}: {originalSize / 1024.0:F1} КБ -> {newSize / 1024.0:F1} КБ ({diff:+0.0;-0.0}%)");
+                Log((UiLanguage.English ? $"{Path.GetFileName(filePath)}: {originalSize / 1024.0:F1} KB -> {newSize / 1024.0:F1} KB ({diff:+0.0;-0.0}%)" : $"{Path.GetFileName(filePath)}: {originalSize / 1024.0:F1} КБ -> {newSize / 1024.0:F1} КБ ({diff:+0.0;-0.0}%)"));
             }
             catch (Exception ex)
             {
-                Log($"Помилка конвертації {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Conversion failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка конвертації {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Конвертацію завершено!");
+        Log((UiLanguage.English ? "Conversion complete!" : "Конвертацію завершено!"));
     }
 
     private void buttonResize_Click(object sender, EventArgs e)
@@ -83,7 +83,7 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -94,7 +94,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log("--- Початок зміни розмірів ---");
+        Log((UiLanguage.English ? "--- Resizing ---" : "--- Початок зміни розмірів ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -131,17 +131,17 @@ public partial class EditorForm
                         string savePath = Path.Combine(outputDir, fileName);
 
                         resized.Save(savePath, GetOriginalFormat(filePath));
-                        Log($"Змінено: {Path.GetFileName(filePath)} ({originalImg.Width}x{originalImg.Height}) -> {newWidth}x{newHeight} px");
+                        Log((UiLanguage.English ? $"Resized: {Path.GetFileName(filePath)} ({originalImg.Width}x{originalImg.Height}) -> {newWidth}x{newHeight} px" : $"Змінено: {Path.GetFileName(filePath)} ({originalImg.Width}x{originalImg.Height}) -> {newWidth}x{newHeight} px"));
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка зміни розміру {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Resize failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка зміни розміру {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Зміну розмірів завершено!");
+        Log((UiLanguage.English ? "Resizing complete!" : "Зміну розмірів завершено!"));
     }
 
     private void buttonReplaceColor_Click(object sender, EventArgs e)
@@ -150,7 +150,7 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -161,9 +161,9 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log("--- Початок заміни кольору ---");
-        Log($"Шукаємо колір R={targetColor.R} G={targetColor.G} B={targetColor.B} (допуск {tolerance}), " +
-            $"замінюємо на R={newColor.R} G={newColor.G} B={newColor.B}");
+        Log((UiLanguage.English ? "--- Replacing color ---" : "--- Початок заміни кольору ---"));
+        Log((UiLanguage.English ? $"Looking for color R={targetColor.R} G={targetColor.G} B={targetColor.B} (tolerance {tolerance}), " : $"Шукаємо колір R={targetColor.R} G={targetColor.G} B={targetColor.B} (допуск {tolerance}), ") +
+            (UiLanguage.English ? $"replace with R={newColor.R} G={newColor.G} B={newColor.B}" : $"замінюємо на R={newColor.R} G={newColor.G} B={newColor.B}"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -178,16 +178,16 @@ public partial class EditorForm
                     string savePath = Path.Combine(outputDir, fileName);
 
                     bmp.Save(savePath, GetOriginalFormat(filePath));
-                    Log($"{Path.GetFileName(filePath)}: замінено пікселів - {replacedPixels}");
+                    Log((UiLanguage.English ? $"{Path.GetFileName(filePath)}: pixels replaced - {replacedPixels}" : $"{Path.GetFileName(filePath)}: замінено пікселів - {replacedPixels}"));
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка заміни кольору {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Color replacement failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка заміни кольору {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Заміну кольору завершено! Файли збережено з суфіксом _color_replaced у папці: " + outputDir);
+        Log((UiLanguage.English ? "Color replacement complete! Files saved with suffix _color_replaced in folder: " : "Заміну кольору завершено! Файли збережено з суфіксом _color_replaced у папці: ") + outputDir);
     }
 
     private void buttonAdjustColor_Click(object sender, EventArgs e)
@@ -196,7 +196,7 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -208,7 +208,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log($"--- Початок корекції балансу (R={trkR.Value}%, G={trkG.Value}%, B={trkB.Value}%, Яскравість={trkBrightness.Value}%) ---");
+        Log((UiLanguage.English ? $"--- Adjusting balance (R={trkR.Value}%, G={trkG.Value}%, B={trkB.Value}%, Brightness={trkBrightness.Value}%) ---" : $"--- Початок корекції балансу (R={trkR.Value}%, G={trkG.Value}%, B={trkB.Value}%, Яскравість={trkBrightness.Value}%) ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -223,16 +223,16 @@ public partial class EditorForm
                     string savePath = Path.Combine(outputDir, fileName);
 
                     bmp.Save(savePath, GetOriginalFormat(filePath));
-                    Log($"Скориговано баланс: {Path.GetFileName(filePath)}");
+                    Log((UiLanguage.English ? $"Balance adjusted: {Path.GetFileName(filePath)}" : $"Скориговано баланс: {Path.GetFileName(filePath)}"));
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка корекції балансу {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Balance adjustment failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка корекції балансу {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Корекцію балансу завершено!");
+        Log((UiLanguage.English ? "Balance adjustment complete!" : "Корекцію балансу завершено!"));
     }
 
     private void buttonApplyTransparency_Click(object sender, EventArgs e)
@@ -241,7 +241,7 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -250,7 +250,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log($"--- Початок застосування прозорості ({trkAlpha.Value}%) ---");
+        Log((UiLanguage.English ? $"--- Applying opacity ({trkAlpha.Value}%) ---" : $"--- Початок застосування прозорості ({trkAlpha.Value}%) ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -260,8 +260,8 @@ public partial class EditorForm
 
                 if (fmt != ImageFormat.Png)
                 {
-                    Log($"Попередження: {Path.GetFileName(filePath)} буде збережено у форматі, " +
-                        $"що не підтримує прозорість - альфа-канал відкинеться при збереженні.");
+                    Log((UiLanguage.English ? $"Warning: {Path.GetFileName(filePath)} will be saved in a format, " : $"Попередження: {Path.GetFileName(filePath)} буде збережено у форматі, ") +
+                        (UiLanguage.English ? $"without transparency support; the alpha channel will be discarded." : $"що не підтримує прозорість - альфа-канал відкинеться при збереженні."));
                 }
 
                 using (Image img = Image.FromFile(filePath))
@@ -273,16 +273,16 @@ public partial class EditorForm
                     string savePath = Path.Combine(outputDir, fileName);
 
                     bmp.Save(savePath, fmt);
-                    Log($"Застосовано прозорість {trkAlpha.Value}%: {Path.GetFileName(filePath)}");
+                    Log((UiLanguage.English ? $"Opacity applied {trkAlpha.Value}%: {Path.GetFileName(filePath)}" : $"Застосовано прозорість {trkAlpha.Value}%: {Path.GetFileName(filePath)}"));
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка застосування прозорості {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Opacity adjustment failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка застосування прозорості {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Застосування прозорості завершено!");
+        Log((UiLanguage.English ? "Opacity adjustment complete!" : "Застосування прозорості завершено!"));
     }
 
     private void buttonApplyContrast_Click(object sender, EventArgs e)
@@ -291,7 +291,7 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -300,7 +300,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log($"--- Початок зміни контрастності ({trkContrast.Value}%) ---");
+        Log((UiLanguage.English ? $"--- Adjusting contrast ({trkContrast.Value}%) ---" : $"--- Початок зміни контрастності ({trkContrast.Value}%) ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -315,16 +315,16 @@ public partial class EditorForm
                     string savePath = Path.Combine(outputDir, fileName);
 
                     bmp.Save(savePath, GetOriginalFormat(filePath));
-                    Log($"Скориговано контраст: {Path.GetFileName(filePath)}");
+                    Log((UiLanguage.English ? $"Contrast adjusted: {Path.GetFileName(filePath)}" : $"Скориговано контраст: {Path.GetFileName(filePath)}"));
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка зміни контрастності {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Contrast adjustment failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка зміни контрастності {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Зміну контрастності завершено!");
+        Log((UiLanguage.English ? "Contrast adjustment complete!" : "Зміну контрастності завершено!"));
     }
 
     private void buttonSplitParts_Click(object sender, EventArgs e)
@@ -333,7 +333,7 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -343,7 +343,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log($"--- Початок розбиття на частини (сітка {rows}x{cols} = {rows * cols} частин) ---");
+        Log((UiLanguage.English ? $"--- Splitting image (grid {rows}x{cols} = {rows * cols} tiles) ---" : $"--- Початок розбиття на частини (сітка {rows}x{cols} = {rows * cols} частин) ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -379,16 +379,16 @@ public partial class EditorForm
                         }
                     }
 
-                    Log($"{Path.GetFileName(filePath)}: розбито на {savedParts} частин");
+                    Log((UiLanguage.English ? $"{Path.GetFileName(filePath)}: split into {savedParts} tiles" : $"{Path.GetFileName(filePath)}: розбито на {savedParts} частин"));
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка розбиття {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Split failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка розбиття {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Розбиття на частини завершено!");
+        Log((UiLanguage.English ? "Split complete!" : "Розбиття на частини завершено!"));
     }
 
     private void buttonCropKeepSelection_Click(object sender, EventArgs e)
@@ -397,15 +397,15 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         if (cropSelectionRel == null)
         {
             MessageBox.Show(
-                "Спочатку виділіть область мишею на попередньому перегляді (перетягніть прямокутник)!",
-                "Увага",
+                (UiLanguage.English ? "First drag a selection in the preview (drag a rectangle)!" : "Спочатку виділіть область мишею на попередньому перегляді (перетягніть прямокутник)!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -414,7 +414,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log("--- Початок кадрування (залишаємо лише виділену область) ---");
+        Log((UiLanguage.English ? "--- Cropping (keep selection only) ---" : "--- Початок кадрування (залишаємо лише виділену область) ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -431,17 +431,17 @@ public partial class EditorForm
                         string savePath = Path.Combine(outputDir, fileName);
 
                         cropped.Save(savePath, GetOriginalFormat(filePath));
-                        Log($"{Path.GetFileName(filePath)}: вирізано область {rect.Width}x{rect.Height}");
+                        Log((UiLanguage.English ? $"{Path.GetFileName(filePath)}: area cropped {rect.Width}x{rect.Height}" : $"{Path.GetFileName(filePath)}: вирізано область {rect.Width}x{rect.Height}"));
                     }
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка кадрування {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Crop failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка кадрування {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Кадрування завершено!");
+        Log((UiLanguage.English ? "Cropping complete!" : "Кадрування завершено!"));
     }
 
     private void buttonRemoveSelection_Click(object sender, EventArgs e)
@@ -450,15 +450,15 @@ public partial class EditorForm
 
         if (selectedFiles.Count == 0)
         {
-            MessageBox.Show("Спочатку оберіть зображення!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
         if (cropSelectionRel == null)
         {
             MessageBox.Show(
-                "Спочатку виділіть область мишею на попередньому перегляді (перетягніть прямокутник)!",
-                "Увага",
+                (UiLanguage.English ? "First drag a selection in the preview (drag a rectangle)!" : "Спочатку виділіть область мишею на попередньому перегляді (перетягніть прямокутник)!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -467,7 +467,7 @@ public partial class EditorForm
         string? outputDir = GetOutputFolder();
         if (string.IsNullOrEmpty(outputDir)) return;
 
-        Log("--- Початок видалення виділеної області ---");
+        Log((UiLanguage.English ? "--- Removing selection ---" : "--- Початок видалення виділеної області ---"));
 
         foreach (string filePath in selectedFiles)
         {
@@ -497,15 +497,15 @@ public partial class EditorForm
                     string savePath = Path.Combine(outputDir, fileName);
 
                     bmp.Save(savePath, fmt);
-                    Log($"{Path.GetFileName(filePath)}: видалено область {rect.Width}x{rect.Height}");
+                    Log((UiLanguage.English ? $"{Path.GetFileName(filePath)}: area removed {rect.Width}x{rect.Height}" : $"{Path.GetFileName(filePath)}: видалено область {rect.Width}x{rect.Height}"));
                 }
             }
             catch (Exception ex)
             {
-                Log($"Помилка видалення області {Path.GetFileName(filePath)}: {ex.Message}");
+                Log((UiLanguage.English ? $"Selection removal failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка видалення області {Path.GetFileName(filePath)}: {ex.Message}"));
             }
         }
 
-        Log("Видалення виділеної області завершено!");
+        Log((UiLanguage.English ? "Selection removal complete!" : "Видалення виділеної області завершено!"));
     }
 }

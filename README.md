@@ -1,39 +1,30 @@
-# Обробник фотографій
+# Photo Editor
 
-Настільний фоторедактор для Windows. Відкрийте добірку фотографій, налаштуйте колір або кадрування та збережіть результат. Файли обробляються локально.
+A Windows desktop editor for local photo processing. Open a collection of photos, adjust color or framing, and compare the result with the original before exporting.
 
-**[Завантажити для Windows x64](https://github.com/kycile24/photo-editor/releases/latest/download/PhotoEditor-win-x64.zip)** · [Усі версії](https://github.com/kycile24/photo-editor/releases)
+**[Download for Windows x64](https://github.com/kycile24/photo-editor/releases/latest/download/PhotoEditor-win-x64.zip)** · [Release history](https://github.com/kycile24/photo-editor/releases)
 
-Розпакуйте архів і двічі натисніть **PhotoEditor.exe**. Середовище .NET вже в комплекті.
+Extract the ZIP and open **PhotoEditor.exe**. The .NET 10 runtime is included. Select **EN** or **УКР** in the toolbar to change the interface language.
 
-**F11** відкриває повноекранний перегляд. Натисніть **Esc**, щоб повернутися до інструментів.
+![Desktop editor with split comparison](https://github.com/kycile24/photo-editor/releases/download/v1.4.0/workspace.png)
 
-![Редактор із відкритим фото та панеллю колірного балансу](https://github.com/kycile24/photo-editor/releases/download/v1.3.0/workspace.png)
+## Try an edit
 
-## Спробуйте на одному фото
+1. Drop a photo into the window or press **Ctrl+O**. A [sample image](examples/preview.jpg) is included.
+2. Choose **Color balance and brightness** and adjust the sliders.
+3. Select **Compare with original** and move the divider. Press **F11** for fullscreen and **Esc** to restore the workspace.
+4. Press **Ctrl+Shift+S** to export the edited preview as a separate PNG.
 
-1. Перетягніть фото у вікно або натисніть **Ctrl+O**. Для першої спроби підійде [зразок JPEG](examples/preview.jpg).
-2. Оберіть **Колірний баланс та яскравість** і перемістіть повзунок. Результат з’явиться у вікні перегляду.
-3. Увімкніть **Порівняти з оригіналом**. Повзунок змінює межу між оригіналом ліворуч і результатом праворуч.
-4. Натисніть **Ctrl+Shift+S**, щоб зберегти поточний вигляд у PNG. Кнопка **Відновити оригінал** відновлює перегляд оригіналу.
+The editor also supports batch resizing and format conversion, cropping and tiling, watermarks, merging, brightness histograms and noise filter comparison with CSV export.
 
-| Інструменти | Можливості |
-| --- | --- |
-| Композиція | Кадрування виділеної області, поділ на частини, об’єднання фотографій і текстові водяні знаки |
-| Світло та колір | Яскравість, контрастність, баланс RGB, заміна кольору, прозорість і чорно-білий ефект |
-| Пакетна обробка | Зміна розмірів і конвертація добірки JPEG, PNG, GIF або BMP у вибрану папку |
-| Аналіз зображення | Гістограма яскравості, порівняння десяти фільтрів зменшення шуму й експорт таблиці в CSV |
+## Development
 
-## Для розробників
+The Windows Forms interface lives in `src/PhotoEditor/UI`. Pixel transforms, filters and metrics live in `src/PhotoEditor/Imaging`.
 
-**C# · .NET 10 · Windows Forms · System.Drawing**
-
-У `src/PhotoEditor/Imaging` розміщено алгоритми роботи з пікселями, фільтри й розрахунок середньоквадратичної похибки. У `src/PhotoEditor/UI` — перегляд, керування інструментами та файлові діалоги.
-
-Для запуску з вихідного коду відкрийте `PhotoEditor.sln` у Visual Studio або виконайте у Windows із .NET 10 SDK:
+With the .NET 10 SDK on Windows:
 
 ```powershell
 dotnet run --project src/PhotoEditor/PhotoEditor.csproj
 ```
 
-GitHub Actions збирає автономний пакет, перевіряє відкриття головного вікна й публікує нову версію з `VERSION` у Releases.
+GitHub Actions verifies the workspace, builds a standalone x64 package, and publishes versioned releases.

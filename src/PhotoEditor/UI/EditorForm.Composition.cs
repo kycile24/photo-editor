@@ -119,7 +119,7 @@ public partial class EditorForm
         catch (Exception ex)
         {
             ClearTaskPreview(picturePreview);
-            Log($"Preview об'єднання: {ex.Message}");
+            Log((UiLanguage.English ? $"Preview merge: {ex.Message}" : $"Preview об'єднання: {ex.Message}"));
         }
     }
 
@@ -203,7 +203,7 @@ public partial class EditorForm
         catch (Exception ex)
         {
             ClearTaskPreview(picturePreview);
-            Log($"Preview водяного знаку: {ex.Message}");
+            Log((UiLanguage.English ? $"Preview watermark: {ex.Message}" : $"Preview водяного знаку: {ex.Message}"));
         }
     }
 
@@ -232,7 +232,7 @@ public partial class EditorForm
         catch (Exception ex)
         {
             ClearTaskPreview(picturePreview);
-            Log($"Preview слайд-шоу: {ex.Message}");
+            Log((UiLanguage.English ? $"Preview slideshow: {ex.Message}" : $"Preview слайд-шоу: {ex.Message}"));
         }
     }
 
@@ -266,8 +266,8 @@ public partial class EditorForm
         if (selectedFiles.Count < 2)
         {
             MessageBox.Show(
-                "Оберіть щонайменше два зображення!",
-                "Увага",
+                (UiLanguage.English ? "Select at least two images!" : "Оберіть щонайменше два зображення!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -276,8 +276,8 @@ public partial class EditorForm
         if (comboMergeFirst.SelectedIndex < 0 || comboMergeSecond.SelectedIndex < 0)
         {
             MessageBox.Show(
-                "Оберіть два зображення для об'єднання!",
-                "Увага",
+                (UiLanguage.English ? "Select two images to merge!" : "Оберіть два зображення для об'єднання!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -289,8 +289,8 @@ public partial class EditorForm
         if (string.Equals(firstPath, secondPath, StringComparison.OrdinalIgnoreCase))
         {
             MessageBox.Show(
-                "Перше і друге зображення мають бути різними!",
-                "Увага",
+                (UiLanguage.English ? "Choose two different images!" : "Перше і друге зображення мають бути різними!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -349,23 +349,23 @@ public partial class EditorForm
                     string savePath = Path.Combine(outputDir, fileName);
                     result.Save(savePath, fmt);
 
-                    Log($"Об'єднано: {Path.GetFileName(firstPath)} + {Path.GetFileName(secondPath)} " +
-                        $"({(horizontal ? "горизонтально" : "вертикально")}) -> {fileName}");
+                    Log((UiLanguage.English ? $"Merged: {Path.GetFileName(firstPath)} + {Path.GetFileName(secondPath)} " : $"Об'єднано: {Path.GetFileName(firstPath)} + {Path.GetFileName(secondPath)} ") +
+                        $"({(horizontal ? UiLanguage.Text("горизонтально") : UiLanguage.Text("вертикально"))}) -> {fileName}");
                 }
             }
 
             MessageBox.Show(
-                "Зображення успішно об'єднано!",
-                "Готово",
+                (UiLanguage.English ? "Images merged!" : "Зображення успішно об'єднано!"),
+                (UiLanguage.English ? "Done" : "Готово"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Information);
         }
         catch (Exception ex)
         {
-            Log($"Помилка об'єднання зображень: {ex.Message}");
+            Log((UiLanguage.English ? $"Image merge failed: {ex.Message}" : $"Помилка об'єднання зображень: {ex.Message}"));
             MessageBox.Show(
-                $"Не вдалося об'єднати зображення:\n{ex.Message}",
-                "Помилка",
+                (UiLanguage.English ? $"Unable to merge images:\n{ex.Message}" : $"Не вдалося об'єднати зображення:\n{ex.Message}"),
+                (UiLanguage.English ? "Error" : "Помилка"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Error);
         }
@@ -456,8 +456,8 @@ public partial class EditorForm
         if (selectedFiles.Count == 0)
         {
             MessageBox.Show(
-                "Спочатку оберіть зображення!",
-                "Увага",
+                (UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -468,8 +468,8 @@ public partial class EditorForm
         if (string.IsNullOrEmpty(watermarkText))
         {
             MessageBox.Show(
-                "Введіть текст водяного знаку!",
-                "Увага",
+                (UiLanguage.English ? "Enter watermark text!" : "Введіть текст водяного знаку!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -491,7 +491,7 @@ public partial class EditorForm
         int selectedIndex = listSelectFile.SelectedIndex;
         if (selectedIndex < 0 || selectedIndex >= selectedFiles.Count)
         {
-            MessageBox.Show("Оберіть файл у списку зліва!", "Увага", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            MessageBox.Show((UiLanguage.English ? "Select a file from the list on the left!" : "Оберіть файл у списку зліва!"), (UiLanguage.English ? "Notice" : "Увага"), MessageBoxButtons.OK, MessageBoxIcon.Warning);
             return;
         }
 
@@ -530,15 +530,15 @@ public partial class EditorForm
                 string fileName = Path.GetFileNameWithoutExtension(filePath) + "_watermark" + Path.GetExtension(filePath);
                 string savePath = Path.Combine(outputDir, fileName);
                 result.Save(savePath, GetOriginalFormat(filePath));
-                Log($"{Path.GetFileName(filePath)}: водяний знак додано ({positionPoint.X:0}, {positionPoint.Y:0}, {trkWatermarkOpacity.Value}%)");
+                Log((UiLanguage.English ? $"{Path.GetFileName(filePath)}: watermark added ({positionPoint.X:0}, {positionPoint.Y:0}, {trkWatermarkOpacity.Value}%)" : $"{Path.GetFileName(filePath)}: водяний знак додано ({positionPoint.X:0}, {positionPoint.Y:0}, {trkWatermarkOpacity.Value}%)"));
             }
         }
         catch (Exception ex)
         {
-            Log($"Помилка водяного знаку {Path.GetFileName(filePath)}: {ex.Message}");
+            Log((UiLanguage.English ? $"Watermark error {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка водяного знаку {Path.GetFileName(filePath)}: {ex.Message}"));
         }
 
-        Log("Додавання водяного знаку завершено!");
+        Log((UiLanguage.English ? "Watermarking complete!" : "Додавання водяного знаку завершено!"));
     }
 
     private void buttonSlideshowStart_Click(object sender, EventArgs e)
@@ -548,8 +548,8 @@ public partial class EditorForm
         if (selectedFiles.Count == 0)
         {
             MessageBox.Show(
-                "Спочатку оберіть зображення!",
-                "Увага",
+                (UiLanguage.English ? "Select an image first!" : "Спочатку оберіть зображення!"),
+                (UiLanguage.English ? "Notice" : "Увага"),
                 MessageBoxButtons.OK,
                 MessageBoxIcon.Warning);
             return;
@@ -561,7 +561,7 @@ public partial class EditorForm
         slideshowTimer.Start();
 
         ShowSlideshowImage();
-        Log($"Слайд-шоу запущено: {slideshowFiles.Count} зображень, затримка {slideshowTimer.Interval} мс.");
+        Log((UiLanguage.English ? $"Slideshow started: {slideshowFiles.Count} images, delay {slideshowTimer.Interval} ms." : $"Слайд-шоу запущено: {slideshowFiles.Count} зображень, затримка {slideshowTimer.Interval} мс."));
     }
 
     private void buttonSlideshowStop_Click(object sender, EventArgs e)
@@ -618,7 +618,7 @@ public partial class EditorForm
         }
         catch (Exception ex)
         {
-            Log($"Помилка показу слайда {Path.GetFileName(filePath)}: {ex.Message}");
+            Log((UiLanguage.English ? $"Slide display failed {Path.GetFileName(filePath)}: {ex.Message}" : $"Помилка показу слайда {Path.GetFileName(filePath)}: {ex.Message}"));
         }
     }
 
@@ -652,6 +652,6 @@ public partial class EditorForm
         }
 
         if (wasRunning)
-            Log("Слайд-шоу зупинено.");
+            Log((UiLanguage.English ? "Slideshow stopped." : "Слайд-шоу зупинено."));
     }
 }

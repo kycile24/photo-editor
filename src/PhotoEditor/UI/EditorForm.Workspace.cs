@@ -40,10 +40,10 @@ public partial class EditorForm
         {
             Dock = DockStyle.Fill, BackColor = Color.FromArgb(36, 44, 44),
             Padding = new Padding(12, 8, 12, 8), Margin = Padding.Empty,
-            ColumnCount = 4, RowCount = 1
+            ColumnCount = 5, RowCount = 1
         };
         header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        foreach (int width in new[] { 116, 105, 130 })
+        foreach (int width in new[] { 116, 105, 130, 68 })
             header.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, width));
         header.Controls.Add(new Label
         {
@@ -67,6 +67,17 @@ public partial class EditorForm
             button.ForeColor = button == export ? Color.FromArgb(23, 49, 37) : Color.White;
             header.Controls.Add(button, column++, 0);
         }
+        var language = new ComboBox { Name = "languageChoice", AccessibleName = "Language / Мова",
+            DropDownStyle = ComboBoxStyle.DropDownList, Anchor = AnchorStyles.Left | AnchorStyles.Right };
+        language.Items.AddRange(new object[] { "УКР", "EN" });
+        language.SelectedIndex = UiLanguage.English ? 1 : 0;
+        language.SelectedIndexChanged += (_, _) =>
+        {
+            UiLanguage.Select(language.SelectedIndex == 1);
+            ApplyLanguage(this);
+            picturePreview.Invalidate();
+        };
+        header.Controls.Add(language, 4, 0);
         workspace.Controls.Add(header, 0, 0);
         workspace.SetColumnSpan(header, 2);
 
@@ -116,7 +127,7 @@ public partial class EditorForm
         picturePreview.Paint += (_, e) =>
         {
             if (picturePreview.Image == null)
-                TextRenderer.DrawText(e.Graphics, "Перетягніть фото сюди або натисніть Ctrl+O",
+                TextRenderer.DrawText(e.Graphics, (UiLanguage.English ? "Drop a photo here or press Ctrl+O" : "Перетягніть фото сюди або натисніть Ctrl+O"),
                     Font, picturePreview.ClientRectangle, Color.Silver,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak);
         };
@@ -144,7 +155,7 @@ public partial class EditorForm
             string[] photos = paths.Where(path => File.Exists(path) &&
                 Path.GetExtension(path).ToLowerInvariant() is ".jpg" or ".jpeg" or ".bmp" or ".gif" or ".png").ToArray();
             if (photos.Length > 0) LoadFiles(photos);
-            else MessageBox.Show(this, "Оберіть файл JPEG, PNG, BMP або GIF.");
+            else MessageBox.Show(this, (UiLanguage.English ? "Choose a file JPEG, PNG, BMP or GIF." : "Оберіть файл JPEG, PNG, BMP або GIF."));
         };
     }
 
@@ -176,9 +187,9 @@ public partial class EditorForm
         if (split < canvas.Width)
             e.Graphics.DrawLine(Pens.White, split, 0, split, canvas.Height);
         if (split > 88)
-            TextRenderer.DrawText(e.Graphics, "Оригінал", Font, new Point(10, 10), Color.White, canvasColor);
+            TextRenderer.DrawText(e.Graphics, (UiLanguage.English ? "Original" : "Оригінал"), Font, new Point(10, 10), Color.White, canvasColor);
         if (canvas.Width - split > 96)
-            TextRenderer.DrawText(e.Graphics, "Результат", Font, new Point(split + 10, 10), Color.White, canvasColor);
+            TextRenderer.DrawText(e.Graphics, (UiLanguage.English ? "Result" : "Результат"), Font, new Point(split + 10, 10), Color.White, canvasColor);
     }
 
     private void SizeWorkspace()
@@ -239,7 +250,7 @@ public partial class EditorForm
         }
         if (picturePreview.Image is not Image image || originalBitmapForPreview == null)
         {
-            MessageBox.Show(this, "Спочатку відкрийте фотографію.");
+            MessageBox.Show(this, (UiLanguage.English ? "Open a photo first." : "Спочатку відкрийте фотографію."));
             return;
         }
 
@@ -253,17 +264,17 @@ public partial class EditorForm
         if (dialog.ShowDialog(this) != DialogResult.OK) return;
         if (selectedFiles.Any(path => string.Equals(Path.GetFullPath(path), dialog.FileName, StringComparison.OrdinalIgnoreCase)))
         {
-            MessageBox.Show(this, "Оберіть нове ім’я для відредагованої копії.");
+            MessageBox.Show(this, (UiLanguage.English ? "Choose a new name for the edited copy." : "Оберіть нове ім’я для відредагованої копії."));
             return;
         }
         try
         {
             snapshot.Save(dialog.FileName, ImageFormat.Png);
-            Log($"Експортовано {Path.GetFileName(dialog.FileName)} · {snapshot.Width} × {snapshot.Height}");
+            Log((UiLanguage.English ? $"Exported {Path.GetFileName(dialog.FileName)} · {snapshot.Width} × {snapshot.Height}" : $"Експортовано {Path.GetFileName(dialog.FileName)} · {snapshot.Width} × {snapshot.Height}"));
         }
         catch (Exception ex)
         {
-            MessageBox.Show(this, ex.Message, "Не вдалося зберегти PNG");
+            MessageBox.Show(this, ex.Message, (UiLanguage.English ? "Unable to save PNG" : "Не вдалося зберегти PNG"));
         }
     }
 }

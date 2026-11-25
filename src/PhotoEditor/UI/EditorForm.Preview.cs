@@ -62,7 +62,7 @@ public partial class EditorForm
 
         ResetPreviewBaseToOriginal();
         SetPreviewImage(BitmapOperations.Ensure32bpp(originalBitmapForPreview));
-        Log("Зображення повернуто до початкового стану.");
+        Log((UiLanguage.English ? "Original image restored." : "Зображення повернуто до початкового стану."));
     }
 
     private void AttachLivePreviewEvents()
@@ -181,7 +181,7 @@ public partial class EditorForm
                 catch (Exception ex)
                 {
                     ClearTaskPreview(picturePreview);
-                    Log($"Не вдалося відкрити {Path.GetFileName(filePath)}: {ex.Message}");
+                    Log((UiLanguage.English ? $"Unable to open {Path.GetFileName(filePath)}: {ex.Message}" : $"Не вдалося відкрити {Path.GetFileName(filePath)}: {ex.Message}"));
                 }
             }
         }
@@ -303,7 +303,7 @@ public partial class EditorForm
         numTB.Value = picked.B;
         pnlTargetPreview.BackColor = Color.FromArgb(picked.R, picked.G, picked.B);
 
-        Log($"Обрано колір з зображення (піксель {px},{py}): R={picked.R} G={picked.G} B={picked.B}");
+        Log((UiLanguage.English ? $"Sampled image color (pixel {px},{py}): R={picked.R} G={picked.G} B={picked.B}" : $"Обрано колір з зображення (піксель {px},{py}): R={picked.R} G={picked.G} B={picked.B}"));
 
         UpdateLivePreview();
     }
@@ -381,7 +381,7 @@ public partial class EditorForm
 
         if (x2 - x1 < 2 || y2 - y1 < 2)
         {
-            Log("Виділена область занадто мала - спробуйте ще раз.");
+            Log((UiLanguage.English ? "Selection too small. Try again." : "Виділена область занадто мала - спробуйте ще раз."));
             currentSelectionControl = Rectangle.Empty;
             picturePreview.Invalidate();
             return;
@@ -389,7 +389,7 @@ public partial class EditorForm
 
         cropSelectionRel = ((x1 / imgW), (y1 / imgH), ((x2 - x1) / imgW), ((y2 - y1) / imgH));
 
-        Log($"Виділено область для кадрування: ({(int)x1},{(int)y1}) - ({(int)x2},{(int)y2}) у координатах прев'ю");
+        Log((UiLanguage.English ? $"Selected crop area: ({(int)x1},{(int)y1}) - ({(int)x2},{(int)y2}) in preview coordinates" : $"Виділено область для кадрування: ({(int)x1},{(int)y1}) - ({(int)x2},{(int)y2}) у координатах прев'ю"));
 
         picturePreview.Invalidate();
     }
