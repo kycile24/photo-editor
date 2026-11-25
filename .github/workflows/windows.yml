@@ -17,6 +17,8 @@ jobs:
           dotnet-version: 8.0.x
       - name: Publish standalone Windows x64 application
         run: dotnet publish src/PhotoEditor/PhotoEditor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o artifacts/app
+      - name: Check responsive canvas and fullscreen on Windows
+        run: dotnet run --project tests/WorkspaceCheck -c Release -- artifacts/workspace.png
       - name: Verify application startup and package it
         shell: pwsh
         run: |
@@ -37,7 +39,9 @@ jobs:
       - uses: actions/upload-artifact@v4
         with:
           name: Windows-package
-          path: artifacts/PhotoEditor-win-x64.zip
+          path: |
+            artifacts/PhotoEditor-win-x64.zip
+            artifacts/workspace.png
 
   release:
     needs: build
@@ -56,5 +60,5 @@ jobs:
         run: |
           version="v$(cat VERSION)"
           if ! gh release view "$version" > /dev/null 2>&1; then
-            gh release create "$version" PhotoEditor-win-x64.zip --target "$GITHUB_SHA" --title "Обробник фотографій $version" --notes-file RELEASE.md
+            gh release create "$version" PhotoEditor-win-x64.zip workspace.png --target "$GITHUB_SHA" --title "Обробник фотографій $version" --notes-file RELEASE.md
           fi

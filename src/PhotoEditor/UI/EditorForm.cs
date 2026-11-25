@@ -59,8 +59,10 @@ public partial class EditorForm : Form
 
     private void SetActionControlsEnabled()
     {
-        foreach (GroupBox group in Controls.OfType<GroupBox>())
+        toolTray.AutoScrollPosition = Point.Empty;
+        foreach (GroupBox group in toolTray.Controls.OfType<GroupBox>())
             group.Visible = group == activeActionGroup;
+        SizeWorkspace();
     }
 
     private void comboAction_SelectedIndexChanged(object sender, EventArgs e)

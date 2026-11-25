@@ -4,31 +4,121 @@ namespace PhotoEditor.UI;
 
 public partial class EditorForm
 {
+    private readonly TableLayoutPanel workspace = new() { Dock = DockStyle.Fill, ColumnCount = 2, RowCount = 3 };
+    private readonly Panel toolTray = new() { Dock = DockStyle.Fill, AutoScroll = true, Margin = Padding.Empty };
+    private readonly Color canvasColor = Color.FromArgb(28, 31, 35);
+    private TableLayoutPanel header = null!;
+    private TableLayoutPanel sidebar = null!;
+    private bool focusMode;
+    private FormWindowState previousState;
+    private Rectangle previousBounds;
+
     private void ConfigureWorkspace()
     {
-        BackColor = Color.FromArgb(247, 248, 250);
-        picturePreview.BackColor = Color.FromArgb(34, 38, 45);
+        SuspendLayout();
+        AutoScroll = false;
+        MinimumSize = new Size(640, 460);
+        BackColor = Color.FromArgb(247, 247, 243);
+        var groups = Controls.OfType<GroupBox>().ToArray();
         lblPickHint.Visible = false;
-        SetCaption(lblFilesList, "Фотографії", 20);
-        SetCaption(lblPreview, "Попередній перегляд", 290);
-        SetCaption(lblLog, "Історія дій", 950);
+        lblAction.Visible = false;
+        lblPreview.Visible = false;
+        workspace.Margin = Padding.Empty;
+        workspace.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 216));
+        workspace.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        workspace.RowStyles.Add(new RowStyle(SizeType.Absolute, 60));
+        workspace.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        workspace.RowStyles.Add(new RowStyle(SizeType.Absolute, 0));
 
-        var menu = new MenuStrip();
-        var file = new ToolStripMenuItem("Файл");
-        file.DropDownItems.Add(new ToolStripMenuItem("Відкрити фотографії…", null, button1_Click, Keys.Control | Keys.O));
-        file.DropDownItems.Add(new ToolStripMenuItem("Експортувати перегляд у PNG…", null, ExportPreview, Keys.Control | Keys.Shift | Keys.S));
-        menu.Items.Add(file);
-        Controls.Add(menu);
-        MainMenuStrip = menu;
-
-        var export = new Button
+        header = new TableLayoutPanel
         {
-            Text = "Експорт у PNG…", Location = new Point(1055, 55),
-            Size = new Size(165, 38), BackColor = Color.FromArgb(31, 87, 108),
-            ForeColor = Color.White, FlatStyle = FlatStyle.Flat
+            Dock = DockStyle.Fill, BackColor = Color.FromArgb(36, 44, 44),
+            Padding = new Padding(12, 8, 12, 8), Margin = Padding.Empty,
+            ColumnCount = 4, RowCount = 1
         };
+        header.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        foreach (int width in new[] { 116, 105, 130 })
+            header.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, width));
+        header.Controls.Add(new Label
+        {
+            Text = "Обробник фотографій", ForeColor = Color.White, AutoEllipsis = true,
+            Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft,
+            Font = new Font(Font.FontFamily, 14, FontStyle.Bold)
+        }, 0, 0);
+        buttonSelectPicture.Text = "Відкрити…";
+        var focus = new Button { Text = "Екран · F11", Name = "focusButton" };
+        var export = new Button { Text = "Експорт PNG…" };
+        focus.Click += (_, _) => ToggleFocusMode();
         export.Click += ExportPreview;
-        Controls.Add(export);
+        int column = 1;
+        foreach (Button button in new[] { buttonSelectPicture, focus, export })
+        {
+            button.Dock = DockStyle.Fill;
+            button.FlatStyle = FlatStyle.Flat;
+            button.FlatAppearance.BorderSize = 0;
+            button.UseVisualStyleBackColor = false;
+            button.BackColor = button == export ? Color.FromArgb(172, 223, 196) : Color.FromArgb(59, 71, 70);
+            button.ForeColor = button == export ? Color.FromArgb(23, 49, 37) : Color.White;
+            header.Controls.Add(button, column++, 0);
+        }
+        workspace.Controls.Add(header, 0, 0);
+        workspace.SetColumnSpan(header, 2);
+
+        sidebar = new TableLayoutPanel
+        {
+            Dock = DockStyle.Fill, Padding = new Padding(12), Margin = Padding.Empty,
+            ColumnCount = 1, RowCount = 7, BackColor = BackColor
+        };
+        sidebar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        foreach (var row in new[] { 28, 38, 30, -62, 42, 30, -38 })
+            sidebar.RowStyles.Add(new RowStyle(row < 0 ? SizeType.Percent : SizeType.Absolute, Math.Abs(row)));
+        lblFilesList.Text = "Фотографії";
+        lblLog.Text = "Історія дій";
+        listSelectFile.IntegralHeight = false;
+        textLog.BorderStyle = BorderStyle.None;
+        textLog.BackColor = sidebar.BackColor;
+        buttonResetToOriginal.Text = "Відновити оригінал";
+        var controls = new Control[] { new Label { Text = "Інструмент" }, comboAction,
+            lblFilesList, listSelectFile, buttonResetToOriginal, lblLog, textLog };
+        for (int row = 0; row < controls.Length; row++)
+        {
+            Control control = controls[row];
+            control.Dock = DockStyle.Fill;
+            if (control is Label label)
+            {
+                label.TextAlign = ContentAlignment.MiddleLeft;
+                label.Font = new Font(Font.FontFamily, 9, FontStyle.Bold);
+            }
+            sidebar.Controls.Add(control, 0, row);
+        }
+        comboAction.DropDownWidth = 340;
+        workspace.Controls.Add(sidebar, 0, 1);
+
+        picturePreview.Dock = DockStyle.Fill;
+        picturePreview.Margin = Padding.Empty;
+        picturePreview.BorderStyle = BorderStyle.None;
+        picturePreview.BackColor = canvasColor;
+        picturePreview.Paint += (_, e) =>
+        {
+            if (picturePreview.Image == null)
+                TextRenderer.DrawText(e.Graphics, "Перетягніть фото сюди або натисніть Ctrl+O",
+                    Font, picturePreview.ClientRectangle, Color.Silver,
+                    TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak);
+        };
+        workspace.Controls.Add(picturePreview, 1, 1);
+        toolTray.BackColor = Color.White;
+        workspace.Controls.Add(toolTray, 0, 2);
+        workspace.SetColumnSpan(toolTray, 2);
+        foreach (GroupBox group in groups)
+        {
+            group.Visible = false;
+            group.Location = new Point(8, 4);
+            toolTray.Controls.Add(group);
+        }
+        Controls.Add(workspace);
+        workspace.BringToFront();
+        workspace.SizeChanged += (_, _) => SizeWorkspace();
+        ResumeLayout(true);
         AllowDrop = true;
         DragEnter += (_, e) => e.Effect = e.Data?.GetDataPresent(DataFormats.FileDrop) == true
             ? DragDropEffects.Copy : DragDropEffects.None;
@@ -42,11 +132,53 @@ public partial class EditorForm
         };
     }
 
-    private static void SetCaption(Label label, string text, int x)
+    private void SizeWorkspace()
     {
-        label.Text = text;
-        label.Location = new Point(x, 102);
-        label.AutoSize = true;
+        int side = focusMode ? 0 : Math.Clamp(workspace.ClientSize.Width / 6, 160, 236);
+        int tools = focusMode || activeActionGroup == null ? 0 :
+            Math.Min(activeActionGroup.Height + SystemInformation.HorizontalScrollBarHeight + 10,
+                     workspace.ClientSize.Height / 3);
+        workspace.ColumnStyles[0].Width = side;
+        workspace.RowStyles[0].Height = focusMode ? 0 : 60;
+        workspace.RowStyles[2].Height = tools;
+    }
+
+    private void ToggleFocusMode()
+    {
+        SuspendLayout();
+        focusMode = !focusMode;
+        if (focusMode)
+        {
+            previousState = WindowState;
+            previousBounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
+            var screen = Screen.FromControl(this);
+            WindowState = FormWindowState.Normal;
+            FormBorderStyle = FormBorderStyle.None;
+            Bounds = screen.Bounds;
+            picturePreview.Focus();
+        }
+        else
+        {
+            FormBorderStyle = FormBorderStyle.Sizable;
+            Bounds = previousBounds;
+            WindowState = previousState;
+        }
+        header.Visible = sidebar.Visible = toolTray.Visible = !focusMode;
+        SizeWorkspace();
+        ResumeLayout(true);
+    }
+
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+    {
+        if (keyData == Keys.F11 || (focusMode && keyData == Keys.Escape))
+            ToggleFocusMode();
+        else if (keyData == (Keys.Control | Keys.O))
+            button1_Click(this, EventArgs.Empty);
+        else if (keyData == (Keys.Control | Keys.Shift | Keys.S))
+            ExportPreview(this, EventArgs.Empty);
+        else
+            return base.ProcessCmdKey(ref msg, keyData);
+        return true;
     }
 
     private void ExportPreview(object? sender, EventArgs e)
