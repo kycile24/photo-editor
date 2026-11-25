@@ -60,6 +60,7 @@ internal class WorkspaceCheck : EditorForm
         Require(editor.Text == "Photo Editor" && compare.Text == "Compare with original", "English captions missing");
         language.SelectedIndex = 0;
         Require(editor.Text == "Обробник фотографій", "Ukrainian captions missing");
+        Application.DoEvents();
         var before = preview.Size;
         Message message = default;
         editor.ProcessCmdKey(ref message, Keys.F11);
@@ -67,7 +68,7 @@ internal class WorkspaceCheck : EditorForm
         Require(!files.Visible && preview.Size == editor.ClientSize, "Fullscreen did not fill window");
         editor.ProcessCmdKey(ref message, Keys.Escape);
         Application.DoEvents();
-        Require(files.Visible && before == preview.Size, "Editor layout did not restore");
+        Require(files.Visible && before == preview.Size, $"Editor layout did not restore: before={before}, after={preview.Size}, files={files.Visible}, client={editor.ClientSize}");
     }
 
     private static void Require(bool ok, string message)

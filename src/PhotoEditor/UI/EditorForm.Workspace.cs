@@ -18,6 +18,7 @@ public partial class EditorForm
     private bool focusMode;
     private FormWindowState previousState;
     private Rectangle previousBounds;
+    private Size previousClientSize;
 
     private void ConfigureWorkspace()
     {
@@ -209,6 +210,7 @@ public partial class EditorForm
         focusMode = !focusMode;
         if (focusMode)
         {
+            previousClientSize = ClientSize;
             previousState = WindowState;
             previousBounds = WindowState == FormWindowState.Normal ? Bounds : RestoreBounds;
             var screen = Screen.FromControl(this);
@@ -222,6 +224,7 @@ public partial class EditorForm
             FormBorderStyle = FormBorderStyle.Sizable;
             Bounds = previousBounds;
             WindowState = previousState;
+            if (previousState == FormWindowState.Normal) ClientSize = previousClientSize;
         }
         header.Visible = sidebar.Visible = toolTray.Visible = !focusMode;
         SizeWorkspace();
