@@ -12,10 +12,13 @@ internal class WorkspaceCheck : EditorForm
         var preview = (PictureBox)editor.Controls.Find("picturePreview", true).Single();
         var tools = (ComboBox)editor.Controls.Find("comboAction", true).Single();
         var files = (ListBox)editor.Controls.Find("listSelectFile", true).Single();
-        editor.ClientSize = new Size(820, 560);
+        var available = Screen.FromControl(editor).WorkingArea;
+        var large = new Size(Math.Min(1280, available.Width - 64), Math.Min(800, available.Height - 96));
+        editor.Location = new Point(available.Left + 8, available.Top + 8);
+        editor.ClientSize = new Size(large.Width - 140, large.Height - 90);
         Application.DoEvents();
         var small = preview.Size;
-        editor.ClientSize = new Size(1280, 800);
+        editor.ClientSize = large;
         Application.DoEvents();
         Require(preview.Width > small.Width && preview.Height > small.Height, "Canvas did not grow");
         var data = new DataObject(DataFormats.FileDrop, new[] { Path.GetFullPath("examples/preview.jpg") });
