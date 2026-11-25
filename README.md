@@ -1,3 +1,5 @@
+**English** · [Українська](README.uk.md)
+
 [![Photo Editor — Windows workspace](docs/cover.svg)](https://github.com/kycile24/photo-editor/releases/latest/download/PhotoEditor-win-x64.zip)
 
 A Windows desktop editor for local photo processing. Open a collection of photos, adjust color or framing, and compare the result with the original before exporting.
