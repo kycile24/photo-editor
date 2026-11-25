@@ -45,6 +45,7 @@ public partial class EditorForm
         {
             box.Image.Dispose();
             box.Image = null;
+            UpdateComparisonAvailability();
         }
     }
 

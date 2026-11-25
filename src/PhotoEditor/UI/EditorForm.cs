@@ -90,6 +90,7 @@ public partial class EditorForm : Form
         int index = comboAction.SelectedIndex - 1;
         activeActionGroup = (index >= 0 && index < groups.Length) ? groups[index] : null;
         SetActionControlsEnabled();
+        UpdateComparisonAvailability();
 
         cropSelectionRel = null;
         currentSelectionControl = Rectangle.Empty;

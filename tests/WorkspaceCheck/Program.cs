@@ -24,6 +24,32 @@ internal class WorkspaceCheck : EditorForm
         tools.SelectedIndex = 4;
         Application.DoEvents();
         Require(editor.Controls.Find("grpColorBalance", true).Single().Visible, "Tool panel missing");
+        var compare = (CheckBox)editor.Controls.Find("comparePhoto", true).Single();
+        var divider = (TrackBar)editor.Controls.Find("comparisonDivider", true).Single();
+        Require(compare.Enabled && !divider.Visible, "Unexpected comparison controls");
+        var adjustments = (TrackBar)editor.Controls.Find("trkBrightness", true).Single();
+        adjustments.Value = 50;
+        var deadline = Environment.TickCount64 + 600;
+        while (Environment.TickCount64 < deadline)
+        {
+            Application.DoEvents();
+            Thread.Sleep(10);
+        }
+        var edited = preview.Image;
+        compare.Checked = true;
+        Require(divider.Visible, "Comparison slider missing");
+        using (var original = new Bitmap(preview.Width, preview.Height))
+        using (var result = new Bitmap(preview.Width, preview.Height))
+        {
+            divider.Value = 100;
+            preview.DrawToBitmap(original, preview.ClientRectangle);
+            divider.Value = 0;
+            preview.DrawToBitmap(result, preview.ClientRectangle);
+            Require(original.GetPixel(original.Width / 2, original.Height / 2) !=
+                    result.GetPixel(result.Width / 2, result.Height / 2), "Comparison did not reveal original");
+            Require(ReferenceEquals(edited, preview.Image), "Comparison replaced export image");
+        }
+        divider.Value = 50;
         using (var screenshot = new Bitmap(editor.Width, editor.Height))
         {
             editor.DrawToBitmap(screenshot, new Rectangle(Point.Empty, editor.Size));

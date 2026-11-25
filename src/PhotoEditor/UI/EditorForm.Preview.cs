@@ -45,6 +45,7 @@ public partial class EditorForm
         if (picturePreview.Image != null)
             picturePreview.Image.Dispose();
         picturePreview.Image = bitmap;
+        UpdateComparisonAvailability();
     }
 
     private void ResetToOriginalImage()

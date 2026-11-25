@@ -9,6 +9,12 @@ public partial class EditorForm
     private readonly Color canvasColor = Color.FromArgb(28, 31, 35);
     private TableLayoutPanel header = null!;
     private TableLayoutPanel sidebar = null!;
+    private readonly CheckBox compare = new() { Name = "comparePhoto", Text = "Порівняти з оригіналом" };
+    private readonly TrackBar divider = new()
+    {
+        Name = "comparisonDivider", AccessibleName = "Межа оригіналу й результату",
+        Maximum = 100, Value = 50, TickStyle = TickStyle.None
+    };
     private bool focusMode;
     private FormWindowState previousState;
     private Rectangle previousBounds;
@@ -67,10 +73,10 @@ public partial class EditorForm
         sidebar = new TableLayoutPanel
         {
             Dock = DockStyle.Fill, Padding = new Padding(12), Margin = Padding.Empty,
-            ColumnCount = 1, RowCount = 7, BackColor = BackColor
+            ColumnCount = 1, RowCount = 9, BackColor = BackColor
         };
         sidebar.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        foreach (var row in new[] { 28, 38, 30, -62, 42, 30, -38 })
+        foreach (var row in new[] { 28, 38, 30, -62, 42, 32, 0, 30, -38 })
             sidebar.RowStyles.Add(new RowStyle(row < 0 ? SizeType.Percent : SizeType.Absolute, Math.Abs(row)));
         lblFilesList.Text = "Фотографії";
         lblLog.Text = "Історія дій";
@@ -79,7 +85,7 @@ public partial class EditorForm
         textLog.BackColor = sidebar.BackColor;
         buttonResetToOriginal.Text = "Відновити оригінал";
         var controls = new Control[] { new Label { Text = "Інструмент" }, comboAction,
-            lblFilesList, listSelectFile, buttonResetToOriginal, lblLog, textLog };
+            lblFilesList, listSelectFile, buttonResetToOriginal, compare, divider, lblLog, textLog };
         for (int row = 0; row < controls.Length; row++)
         {
             Control control = controls[row];
@@ -91,6 +97,15 @@ public partial class EditorForm
             }
             sidebar.Controls.Add(control, 0, row);
         }
+        compare.Enabled = false;
+        divider.Visible = false;
+        compare.CheckedChanged += (_, _) =>
+        {
+            divider.Visible = compare.Checked;
+            sidebar.RowStyles[6].Height = compare.Checked ? 30 : 0;
+            picturePreview.Invalidate();
+        };
+        divider.ValueChanged += (_, _) => picturePreview.Invalidate();
         comboAction.DropDownWidth = 340;
         workspace.Controls.Add(sidebar, 0, 1);
 
@@ -105,6 +120,7 @@ public partial class EditorForm
                     Font, picturePreview.ClientRectangle, Color.Silver,
                     TextFormatFlags.HorizontalCenter | TextFormatFlags.VerticalCenter | TextFormatFlags.WordBreak);
         };
+        picturePreview.Paint += PaintComparison;
         workspace.Controls.Add(picturePreview, 1, 1);
         toolTray.BackColor = Color.White;
         workspace.Controls.Add(toolTray, 0, 2);
@@ -130,6 +146,39 @@ public partial class EditorForm
             if (photos.Length > 0) LoadFiles(photos);
             else MessageBox.Show(this, "Оберіть файл JPEG, PNG, BMP або GIF.");
         };
+    }
+
+    private void UpdateComparisonAvailability()
+    {
+        compare.Enabled = originalBitmapForPreview != null && picturePreview.Image != null &&
+            activeActionGroup != grpSlideshow;
+        if (!compare.Enabled) compare.Checked = false;
+    }
+
+    private void PaintComparison(object? sender, PaintEventArgs e)
+    {
+        if (!compare.Checked || originalBitmapForPreview is not Bitmap original ||
+            picturePreview.Image == null) return;
+
+        Rectangle canvas = picturePreview.ClientRectangle;
+        int split = canvas.Width * divider.Value / 100;
+        if (split == 0 || canvas.Height == 0) return;
+        float scale = Math.Min((float)canvas.Width / original.Width, (float)canvas.Height / original.Height);
+        var width = Math.Max(1, (int)(original.Width * scale));
+        var height = Math.Max(1, (int)(original.Height * scale));
+        var bounds = new Rectangle((canvas.Width - width) / 2, (canvas.Height - height) / 2, width, height);
+        var state = e.Graphics.Save();
+        e.Graphics.SetClip(new Rectangle(0, 0, split, canvas.Height), System.Drawing.Drawing2D.CombineMode.Intersect);
+        using (var background = new SolidBrush(canvasColor))
+            e.Graphics.FillRectangle(background, canvas);
+        e.Graphics.DrawImage(original, bounds);
+        e.Graphics.Restore(state);
+        if (split < canvas.Width)
+            e.Graphics.DrawLine(Pens.White, split, 0, split, canvas.Height);
+        if (split > 88)
+            TextRenderer.DrawText(e.Graphics, "Оригінал", Font, new Point(10, 10), Color.White, canvasColor);
+        if (canvas.Width - split > 96)
+            TextRenderer.DrawText(e.Graphics, "Результат", Font, new Point(split + 10, 10), Color.White, canvasColor);
     }
 
     private void SizeWorkspace()
