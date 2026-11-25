@@ -1,4 +1,4 @@
-# Photo Editor
+[![Photo Editor — Windows workspace](docs/cover.svg)](https://github.com/kycile24/photo-editor/releases/latest/download/PhotoEditor-win-x64.zip)
 
 A Windows desktop editor for local photo processing. Open a collection of photos, adjust color or framing, and compare the result with the original before exporting.
 
@@ -8,7 +8,7 @@ Extract the ZIP and open **PhotoEditor.exe**. The .NET 10 runtime is included. S
 
 ![Desktop editor with split comparison](https://github.com/kycile24/photo-editor/releases/download/v1.4.0/workspace.png)
 
-## Try an edit
+## From original to export
 
 1. Drop a photo into the window or press **Ctrl+O**. A [sample image](examples/preview.jpg) is included.
 2. Choose **Color balance and brightness** and adjust the sliders.
