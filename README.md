@@ -8,7 +8,7 @@
 
 **F11** відкриває повноекранний перегляд. Натисніть **Esc**, щоб повернутися до інструментів.
 
-![Редактор із відкритим фото та панеллю колірного балансу](https://github.com/kycile24/photo-editor/releases/download/v1.2.0/workspace.png)
+![Редактор із відкритим фото та панеллю колірного балансу](https://github.com/kycile24/photo-editor/releases/download/v1.3.0/workspace.png)
 
 ## Спробуйте на одному фото
 
@@ -26,11 +26,11 @@
 
 ## Для розробників
 
-**C# · .NET 8 · Windows Forms · System.Drawing**
+**C# · .NET 10 · Windows Forms · System.Drawing**
 
 У `src/PhotoEditor/Imaging` розміщено алгоритми роботи з пікселями, фільтри й розрахунок середньоквадратичної похибки. У `src/PhotoEditor/UI` — перегляд, керування інструментами та файлові діалоги.
 
-Для запуску з вихідного коду відкрийте `PhotoEditor.sln` у Visual Studio або виконайте у Windows із .NET 8 SDK:
+Для запуску з вихідного коду відкрийте `PhotoEditor.sln` у Visual Studio або виконайте у Windows із .NET 10 SDK:
 
 ```powershell
 dotnet run --project src/PhotoEditor/PhotoEditor.csproj

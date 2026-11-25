@@ -4,7 +4,7 @@
     <OutputType>WinExe</OutputType>
     <Product>Обробник фотографій</Product>
     <Description>Редактор фотографій для Windows</Description>
-    <TargetFramework>net8.0-windows</TargetFramework>
+    <TargetFramework>net10.0-windows</TargetFramework>
     <Nullable>enable</Nullable>
     <UseWindowsForms>true</UseWindowsForms>
     <ImplicitUsings>enable</ImplicitUsings>
