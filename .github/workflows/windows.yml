@@ -1,0 +1,60 @@
+name: Windows desktop
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: Publish standalone Windows x64 application
+        run: dotnet publish src/PhotoEditor/PhotoEditor.csproj -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -p:DebugType=None -p:DebugSymbols=false -o artifacts/app
+      - name: Verify application startup and package it
+        shell: pwsh
+        run: |
+          $exe = Resolve-Path artifacts/app/PhotoEditor.exe
+          $process = Start-Process $exe -PassThru
+          try {
+            $deadline = (Get-Date).AddSeconds(30)
+            do {
+              Start-Sleep -Milliseconds 350
+              $process.Refresh()
+              if ($process.HasExited) { throw "Editor exited during startup." }
+            } until ($process.MainWindowTitle -eq 'Обробник фотографій' -or (Get-Date) -gt $deadline)
+            if ($process.MainWindowTitle -ne 'Обробник фотографій') { throw "Editor window did not open." }
+          } finally {
+            if (-not $process.HasExited) { Stop-Process -Id $process.Id }
+          }
+          Compress-Archive -Path artifacts/app/* -DestinationPath artifacts/PhotoEditor-win-x64.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: Windows-package
+          path: artifacts/PhotoEditor-win-x64.zip
+
+  release:
+    needs: build
+    if: github.ref == 'refs/heads/main' && github.event_name != 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/download-artifact@v4
+        with:
+          name: Windows-package
+      - name: Publish a versioned release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          version="v$(cat VERSION)"
+          if ! gh release view "$version" > /dev/null 2>&1; then
+            gh release create "$version" PhotoEditor-win-x64.zip --target "$GITHUB_SHA" --title "Обробник фотографій $version" --notes-file RELEASE.md
+          fi
